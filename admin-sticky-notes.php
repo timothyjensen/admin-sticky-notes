@@ -22,16 +22,16 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 //* Plugin Directory
-define( 'TJ_DIR', __DIR__ );
+define( 'ASN_DIR', __DIR__ );
 
 //* Plugin URL
-define( 'TJ_URL', plugin_dir_url(__FILE__) );
+define( 'ASN_URL', plugin_dir_url(__FILE__) );
 
 //* Initialize CMB2
-if ( file_exists( TJ_DIR . '/lib/CMB2/init.php' ) ) {
-	require_once TJ_DIR . '/lib/CMB2/init.php';
-} elseif ( file_exists( TJ_DIR . '/lib/cmb2/init.php' ) ) {
-	require_once TJ_DIR . '/lib/cmb2/init.php';
+if ( file_exists( ASN_DIR . '/lib/CMB2/init.php' ) ) {
+	require_once ASN_DIR . '/lib/CMB2/init.php';
+} elseif ( file_exists( ASN_DIR . '/lib/cmb2/init.php' ) ) {
+	require_once ASN_DIR . '/lib/cmb2/init.php';
 }
 
 //* Registers admin notes metabox
@@ -59,7 +59,7 @@ function tj_register_admin_notes_metabox() {
 
 	$cmb->add_field( array(
 		'name'             => __( 'Heading', 'cmb2' ),
-		'description' 	=> 'Include the heading <u>Admin Notes</u> when there are items in the notes section below',
+		'description'      => 'Include a heading for the notes section below (Optional)',
 		'id'               => $prefix . 'admin_notes_label',
 		'type'             => 'text_medium',
 		) );
@@ -99,11 +99,11 @@ function tj_enqueue_admin_scripts() {
 
     wp_enqueue_script( 'jquery-ui-draggable' );
 
-    wp_enqueue_script( 'admin-notes-draggable', TJ_URL . 'lib/js/admin-notes-draggable.js', array(), '1.0.0', false );
+    wp_enqueue_script( 'admin-notes-draggable', ASN_URL . 'lib/js/admin-notes-draggable.js', array(), '1.0.0', false );
 
-    wp_enqueue_script( 'toggle-hidden', TJ_URL . 'lib/js/toggle-hidden.js', array(), '1.0.0', false );
+    wp_enqueue_script( 'toggle-hidden', ASN_URL . 'lib/js/toggle-hidden.js', array(), '1.0.0', false );
 
-    wp_enqueue_style( 'admin-notes', TJ_URL . 'lib/css/admin-notes-style.css', array(), '1.0.0', false );
+    wp_enqueue_style( 'admin-notes', ASN_URL . 'lib/css/admin-notes-style.css', array(), '1.0.0', false );
 
 }
 
@@ -113,39 +113,36 @@ function tj_enqueue_admin_scripts() {
  */
 function tj_render_admin_notes() {
 
-	$object_id = get_the_ID();
-	$metabox_id = 'tj_admin_notes_metabox';
-
-	$form = cmb2_get_metabox_form( $metabox_id, $object_id );
-
-
-    $admin_notes_label = get_post_meta( get_the_ID(), 'tj_admin_notes_label', true );
+    //* Get the note content
     $admin_notes = get_post_meta( get_the_ID(), 'tj_admin_notes', true );
 
+    //* Return if there are no notes
     if ( empty ( $admin_notes ) )
 		return;
 
-    printf( '<div id="admin-notes" class="entry-content"><div id="tj-admin-note"><h2>%s</h2>', $admin_notes_label );
+    //* Get the note label
+    $admin_notes_label = get_post_meta( get_the_ID(), 'tj_admin_notes_label', true );
 
-    echo apply_filters( 'the_content', $admin_notes);
+    //* Render the note
+    echo '<div id="admin-notes" class="entry-content"><div id="tj-admin-note">';
+
+        if ( $admin_notes_label) printf( '<h2>%s</h2>', $admin_notes_label );
+
+        echo apply_filters( 'the_content', $admin_notes);
 
 	echo '</div>'; //* End #tj-admin-note
 
+    //* Button toggles the note editor
 	echo '<button id="toggle-editor">edit note</button>';
 
-    //tj_show_admin_note_editor();
+        //* WYSIWYG editor
+        $object_id = get_the_ID();
+    	$metabox_id = 'tj_admin_notes_metabox';
+
+    	$form = cmb2_get_metabox_form( $metabox_id, $object_id );
+
     	printf( '<div id="tj-admin-note-editor" class="hidden">%s</div>', $form );
 
     echo '</div>'; //* End #admin-notes
-
-}
-
-function tj_show_admin_note_editor() {
-	$object_id = get_the_ID();
-	$metabox_id = 'tj_admin_notes_metabox';
-
-	$form = cmb2_get_metabox_form( $metabox_id, $object_id );
-
-	//printf( '<div id="tj-admin-note-editor" class="hidden">%s</div>', $form );
 
 }
