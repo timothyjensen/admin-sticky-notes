@@ -98,7 +98,7 @@ function tj_admin_notes() {
  */
 function tj_enqueue_admin_scripts() {
 
-    wp_enqueue_script( 'admin-sticky-notes', ASN_URL . 'lib/js/admin-sticky-notes.js', array('jquery', 'jquery-ui-draggable'), '1.0.0', false );
+    wp_enqueue_script( 'admin-sticky-notes', ASN_URL . 'lib/js/admin-sticky-notes.js', array( 'jquery', 'jquery-ui-draggable' ), '1.0.0', false );
 
     wp_enqueue_style( 'admin-notes', ASN_URL . 'lib/css/admin-notes-style.css', array(), '1.0.0', false );
 
