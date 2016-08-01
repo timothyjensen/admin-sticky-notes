@@ -68,6 +68,9 @@ function tj_register_admin_notes_metabox() {
 		'name'             => __( 'Notes', 'cmb2' ),
 		'id'               => $prefix . 'admin_notes',
 		'type'             => 'wysiwyg',
+        'options' => array(
+                'media_buttons' => false,
+            ),
 		) );
 
 }
@@ -95,13 +98,7 @@ function tj_admin_notes() {
  */
 function tj_enqueue_admin_scripts() {
 
-    wp_enqueue_script( 'jquery' );
-
-    wp_enqueue_script( 'jquery-ui-draggable' );
-
-    wp_enqueue_script( 'admin-notes-draggable', ASN_URL . 'lib/js/admin-notes-draggable.js', array(), '1.0.0', false );
-
-    wp_enqueue_script( 'toggle-hidden', ASN_URL . 'lib/js/toggle-hidden.js', array(), '1.0.0', false );
+    wp_enqueue_script( 'admin-sticky-notes', ASN_URL . 'lib/js/admin-sticky-notes.js', array('jquery', 'jquery-ui-draggable'), '1.0.0', false );
 
     wp_enqueue_style( 'admin-notes', ASN_URL . 'lib/css/admin-notes-style.css', array(), '1.0.0', false );
 
