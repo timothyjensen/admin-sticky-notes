@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Admin Notes
+ * Plugin Name: Admin Sticky Notes
  * Plugin URI: https://github.com/timothyjensen/admin-sticky-notes
  * Description: Adds a metabox for Admin Notes that appear on the front end when an admin is logged in.  This is helpful for keeping track of edits that need to be made on each page when building a site.
  * Version: 1.0.0
