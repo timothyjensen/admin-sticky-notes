@@ -40,10 +40,11 @@ add_action( 'cmb2_init', 'tj_register_admin_notes_metabox' );
 //* Renders notes on the front end only when an Admin is logged in
 add_action( 'cmb2_init', 'tj_admin_notes' );
 
+//* Shortcode to list all page titles with their associated sticky note content.
 add_shortcode( 'list-admin-sticky-notes', 'tj_list_admin_sticky_notes' );
 
 /**
- * Registers admin notes metabox
+ * Registers admin notes metabox.
  *
  */
 function tj_register_admin_notes_metabox() {
