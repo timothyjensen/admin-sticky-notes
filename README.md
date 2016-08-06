@@ -2,7 +2,7 @@
 
 Admin Sticky Notes is a WordPress plugin that allows you to add sticky notes to pages and posts, and display them on the front end when an admin level user is logged in.
 
-The purpose of this plugin is to make it easier to keep track of edits that you need to make on each page/post.
+The purpose of this plugin is to make it easier to keep track of edits that you need to make on each post/page.
 
 ## Instructions
 

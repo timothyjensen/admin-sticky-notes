@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Admin Sticky Notes
  * Plugin URI: https://github.com/timothyjensen/admin-sticky-notes
- * Description: Adds a metabox for Admin Notes that appear on the front end when an admin is logged in.  This is helpful for keeping track of edits that need to be made on each page when building a site.
+ * Description: Adds a metabox for Admin Notes that appear on the front end when an admin is logged in.  This is helpful for keeping track of edits that need to be made on each post/page.
  * Version: 1.0.0
  * Author: Tim Jensen
  * Author URI: http://www.timjensen.us
@@ -38,7 +38,9 @@ if ( file_exists( ASN_DIR . '/lib/CMB2/init.php' ) ) {
 add_action( 'cmb2_init', 'tj_register_admin_notes_metabox' );
 
 //* Renders notes on the front end only when an Admin is logged in
-add_action( 'pre_get_posts', 'tj_admin_notes' );
+add_action( 'cmb2_init', 'tj_admin_notes' );
+
+add_shortcode( 'list-admin-sticky-notes', 'tj_list_admin_sticky_notes' );
 
 /**
  * Registers admin notes metabox
@@ -82,13 +84,13 @@ function tj_register_admin_notes_metabox() {
  */
 function tj_admin_notes() {
 
-    if ( ! current_user_can( 'edit_dashboard' ) || is_search() ) return;
+    if ( ! current_user_can( 'edit_dashboard' ) ) return;
 
     //* Enqueue required Javascript
     add_action( 'wp_enqueue_scripts', 'tj_enqueue_admin_scripts' );
 
     //* Add Admin Notes to front end
-    add_action( 'wp_footer', 'tj_render_admin_notes', 13 );
+    add_action( 'loop_start', 'tj_render_admin_notes', 13 );
 
 }
 
@@ -110,15 +112,17 @@ function tj_enqueue_admin_scripts() {
  */
 function tj_render_admin_notes() {
 
+    $post_ID = get_the_ID();
+
     //* Get the note content
-    $admin_notes = get_post_meta( get_the_ID(), 'tj_admin_notes', true );
+    $admin_notes = get_post_meta( $post_ID, 'tj_admin_notes', true );
 
     //* Return if there are no notes
     if ( empty ( $admin_notes ) )
 		return;
 
     //* Get the note label
-    $admin_notes_label = get_post_meta( get_the_ID(), 'tj_admin_notes_label', true );
+    $admin_notes_label = get_post_meta( $post_ID, 'tj_admin_notes_label', true );
 
     //* Render the note
     echo '<div id="admin-notes" class="entry-content"><div id="tj-admin-note">';
@@ -132,14 +136,49 @@ function tj_render_admin_notes() {
     //* Button toggles the note editor
 	echo '<button id="toggle-editor">edit note</button>';
 
-        //* WYSIWYG editor
-        $object_id = get_the_ID();
-    	$metabox_id = 'tj_admin_notes_metabox';
-
-    	$form = cmb2_get_metabox_form( $metabox_id, $object_id );
-
+        //* Render the WYSIWYG editor form
+        $metabox_id = 'tj_admin_notes_metabox';
+        $form = cmb2_get_metabox_form( $metabox_id, $post_ID );
     	printf( '<div id="tj-admin-note-editor" class="hidden">%s</div>', $form );
 
     echo '</div>'; //* End #admin-notes
+
+}
+
+
+/**
+ * Creates shortcode to list all pages that have a sticky note as well as the content of the note
+ *
+ * @return string, the list of pages along with their note
+ */
+function tj_list_admin_sticky_notes() {
+
+    $args = array(
+        'posts_per_page' 	=> -1,
+        'order' 		=> 'ASC',
+        'orderby' 		=> 'title',
+        'post_type'     => 'any',
+        'meta_key'      => 'tj_admin_notes_label',
+        'meta_value'    => 'Admin Notes',
+    );
+
+    $wp_query = new WP_Query($args);
+
+    $list_sticky_notes = '<ol>';
+
+    if ( $wp_query->have_posts() ) :
+
+		while ( $wp_query->have_posts() ) : $wp_query->the_post();
+
+            $list_sticky_notes .= sprintf( '<li><a href=%s>%s</a>', get_the_permalink(), get_the_title() );
+            $list_sticky_notes .= sprintf( '%s</li>', apply_filters( 'the_content', get_post_meta( get_the_ID(), 'tj_admin_notes', true ) ) );
+
+		endwhile; //* end of one post
+
+	endif; //* end loop
+
+    $list_sticky_notes .= '</ol>';
+
+    return $list_sticky_notes;
 
 }
